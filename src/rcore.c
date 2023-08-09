@@ -5087,14 +5087,17 @@ void WaitTime(double seconds)
     while (GetTime() < destinationTime) { }
 #else
     #if defined(SUPPORT_PARTIALBUSY_WAIT_LOOP)
-        double sleepSeconds = seconds - seconds*0.05;  // NOTE: We reserve a percentage of the time for busy waiting
+        double sleepSeconds = seconds - 0.001;  // FARBS: We reserve the last millisecond for busy waiting
     #else
         double sleepSeconds = seconds;
     #endif
 
     // System halt functions
     #if defined(_WIN32)
-        Sleep((unsigned long)(sleepSeconds*1000.0));
+		if(sleepSeconds > 0)
+		{
+			Sleep((unsigned long)(sleepSeconds*1000.0));
+		}
     #endif
     #if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__EMSCRIPTEN__)
         struct timespec req = { 0 };
